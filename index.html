@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>象形统计图大冒险 - 边玩边学</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            min-height: 100vh;
+        }
+        .comic-font {
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .symbol-item {
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .symbol-item:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+        .btn-game {
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #0369a1;
+        }
+        .btn-game:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #0369a1;
+        }
+        .progress-bar {
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .progress-inner {
+            height: 100%;
+            background: #3b82f6;
+            transition: width 0.5s ease;
+        }
+        .input-box {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 12px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-box:focus {
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- 顶部导航和进度 -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl text-blue-600 comic-font">象形统计图大冒险 🚀</h1>
+                <p class="text-gray-500 mt-2 text-lg">任务持续更新！完成所有挑战，赢取数学勋章！</p>
+            </div>
+            <div class="text-right">
+                <div class="text-sm font-bold text-blue-500 mb-1">完成进度</div>
+                <div class="progress-bar w-32">
+                    <div id="progressBar" class="progress-inner" style="width: 50%;"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 游戏切换按钮 -->
+        <div class="flex gap-4 mb-6">
+            <button onclick="switchLevel(1)" id="tab1" class="px-6 py-2 rounded-full font-bold bg-blue-500 text-white shadow-lg">第一关：歌唱比赛</button>
+            <button onclick="switchLevel(2)" id="tab2" class="px-6 py-2 rounded-full font-bold bg-white text-blue-500 hover:bg-blue-50 transition">第二关：阅读马拉松</button>
+        </div>
+
+        <!-- 第一关：森林歌唱大赛 -->
+        <section id="level1" class="card p-8 border-4 border-blue-200">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="text-3xl">🎤</span>
+                <h2 class="text-2xl font-bold text-blue-800">关卡 1：各年级参加歌唱比赛人数</h2>
+            </div>
+
+            <!-- 图例说明 -->
+            <div class="bg-blue-50 p-4 rounded-xl border-2 border-dashed border-blue-300 mb-8 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-blue-700">图例：</span>
+                    <div class="w-8 h-8 bg-orange-400 flex items-center justify-center text-white font-bold transform rotate-45 text-xs">▲</div>
+                    <span class="text-blue-900 font-bold">= 5 位同学</span>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-blue-600 italic font-bold text-orange-600">注意：每个年级上限 70 人</p>
+                    <p class="text-xs text-gray-500 italic">点击 [▲] 符号可以删除</p>
+                </div>
+            </div>
+
+            <!-- 统计图主体 -->
+            <div class="space-y-6">
+                <div id="gradeContainer" class="space-y-6">
+                    <!-- 动态渲染 -->
+                </div>
+            </div>
+
+            <!-- 题目区 -->
+            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-6 bg-yellow-50 rounded-2xl border-2 border-yellow-200">
+                    <h3 class="font-bold text-yellow-800 mb-4 flex items-center gap-2">
+                        <span>📝</span> 基础挑战
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="quiz-item">
+                            <p class="text-gray-700 text-sm mb-2">Q1: 三年级和六年级一共有多少人参加？</p>
+                            <div class="flex gap-2">
+                                <input type="number" id="q1_1" class="input-box w-24" placeholder="人数">
+                                <button onclick="checkQ1_1()" class="bg-yellow-500 text-white px-3 py-1 rounded-lg font-bold btn-game">提交</button>
+                            </div>
+                        </div>
+                        <div class="quiz-item">
+                            <p class="text-gray-700 text-sm mb-2">Q2: 四年级比五年级多几个人？</p>
+                            <div class="flex gap-2">
+                                <input type="number" id="q1_2" class="input-box w-24" placeholder="人数">
+                                <button onclick="checkQ1_2()" class="bg-yellow-500 text-white px-3 py-1 rounded-lg font-bold btn-game">提交</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-green-50 rounded-2xl border-2 border-green-200">
+                    <h3 class="font-bold text-green-800 mb-4 flex items-center gap-2">
+                        <span>🌟</span> 高级侦探
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="quiz-item">
+                            <p class="text-gray-700 text-sm mb-2">Q3: 如果每个年级都要达到30人，一共还需要增加多少个 ▲ ？</p>
+                            <div class="flex gap-2">
+                                <input type="number" id="q1_3" class="input-box w-24" placeholder="符号数">
+                                <button onclick="checkQ1_3()" class="bg-green-500 text-white px-3 py-1 rounded-lg font-bold btn-game">提交</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第二关：阅读马拉松 -->
+        <section id="level2" class="card p-8 border-4 border-purple-200 hidden">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="text-3xl">📚</span>
+                <h2 class="text-2xl font-bold text-purple-800">关卡 2：书香探险家 - 阅读天数统计</h2>
+            </div>
+
+            <div class="bg-purple-50 p-4 rounded-xl border-2 border-dashed border-purple-300 mb-8 flex items-center">
+                <span class="font-bold text-purple-700 mr-4">图例：</span>
+                <div class="w-6 h-6 bg-blue-500 border-2 border-white shadow-sm flex items-center justify-center text-white font-bold transform rotate-45 text-[8px]"></div>
+                <span class="ml-2 text-purple-900 font-bold">= 2 天</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- 统计图 -->
+                <div class="space-y-6 bg-gray-50 p-6 rounded-2xl" id="readChart">
+                    <!-- 动态生成阅读榜 -->
+                </div>
+
+                <!-- 题目区 -->
+                <div class="space-y-4">
+                    <div class="p-5 bg-white shadow-sm border-2 border-purple-100 rounded-2xl">
+                        <h4 class="text-purple-600 font-bold mb-3 flex items-center gap-2">
+                            <span>🔍</span> 数据分析挑战：
+                        </h4>
+                        <div class="space-y-5">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">1. 凯文比世杰多读了几天？</p>
+                                <div class="flex gap-2">
+                                    <input type="number" id="q2_1" class="input-box w-full" placeholder="输入天数">
+                                    <button onclick="checkQ2_1()" class="bg-purple-500 text-white px-4 py-1 rounded-lg font-bold btn-game">检查</button>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">2. 这四位同学一共阅读了多少天？</p>
+                                <div class="flex gap-2">
+                                    <input type="number" id="q2_2" class="input-box w-full" placeholder="输入总天数">
+                                    <button onclick="checkQ2_2()" class="bg-purple-500 text-white px-4 py-1 rounded-lg font-bold btn-game">检查</button>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">3. 谁排在阅读榜的第 2 名？</p>
+                                <div class="flex gap-2">
+                                    <select id="q2_3" class="input-box w-full text-sm">
+                                        <option value="">请选择...</option>
+                                        <option value="温妮">温妮</option>
+                                        <option value="艾莎">艾莎</option>
+                                        <option value="世杰">世杰</option>
+                                        <option value="凯文">凯文</option>
+                                    </select>
+                                    <button onclick="checkQ2_3()" class="bg-purple-500 text-white px-4 py-1 rounded-lg font-bold btn-game">检查</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5 bg-blue-50 border-2 border-blue-100 rounded-2xl">
+                        <h4 class="text-blue-700 font-bold mb-2 flex items-center gap-2">
+                            <span>🧠</span> 终极脑力：
+                        </h4>
+                        <p class="text-sm text-blue-600 mb-3">如果想让四人的总天数达到 50 天，还需要再读几天？</p>
+                        <div class="flex gap-2">
+                            <input type="number" id="q2_4" class="input-box w-full" placeholder="需要补上的天数">
+                            <button onclick="checkQ2_4()" class="bg-blue-600 text-white px-4 py-1 rounded-lg font-bold btn-game">提交</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 成功/失败反馈 -->
+        <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-8 py-4 rounded-full shadow-2xl font-bold opacity-0 transition-opacity pointer-events-none z-50">
+            🌟 太棒了！回答正确！
+        </div>
+
+    </div>
+
+    <script>
+        // 数据模型
+        let level1Data = [
+            { grade: "三年级", symbols: 4 },
+            { grade: "四年级", symbols: 6 },
+            { grade: "五年级", symbols: 5 },
+            { grade: "六年级", symbols: 4 }
+        ];
+
+        const level2Data = [
+            { name: "温妮", symbols: 5 },
+            { name: "艾莎", symbols: 4 },
+            { name: "世杰", symbols: 3 },
+            { name: "凯文", symbols: 7 }
+        ];
+
+        // --- 第一关逻辑 ---
+        function renderLevel1() {
+            const container = document.getElementById('gradeContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            level1Data.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center';
+                row.innerHTML = `
+                    <div class="w-20 font-bold text-gray-700">${item.grade}</div>
+                    <div class="flex-1 bg-gray-50 p-3 rounded-lg flex items-center gap-2 flex-wrap min-h-[50px]">
+                        ${Array(item.symbols).fill(0).map(() => `
+                            <div onclick="removeSym1(${idx})" class="w-8 h-8 bg-orange-400 flex items-center justify-center text-white font-bold transform rotate-45 text-xs symbol-item shadow-sm">▲</div>
+                        `).join('')}
+                    </div>
+                    <div class="ml-4 flex items-center gap-2">
+                        <span class="w-12 text-center font-bold text-blue-600 text-xl">${item.symbols * 5}</span>
+                        <button onclick="addSym1(${idx})" class="w-8 h-8 bg-green-500 text-white rounded-full font-bold hover:bg-green-600 shadow-md">+</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function addSym1(idx) {
+            // 限制人数为 70 人，即 14 个符号 (14 * 5 = 70)
+            if (level1Data[idx].symbols >= 14) {
+                showToast("该年级人数已达上限（70人）！", "bg-red-500");
+                return;
+            }
+            level1Data[idx].symbols++;
+            renderLevel1();
+        }
+
+        function removeSym1(idx) {
+            if(level1Data[idx].symbols > 0) {
+                level1Data[idx].symbols--;
+                renderLevel1();
+            }
+        }
+
+        function checkQ1_1() {
+            const val = parseInt(document.getElementById('q1_1').value);
+            const correct = (level1Data[0].symbols + level1Data[3].symbols) * 5;
+            if(val === correct) showToast("正确！计算得真快！");
+            else showToast(`不对哦，目前三、六年级一共 ${(level1Data[0].symbols + level1Data[3].symbols)} 个符号，即 ${correct} 人`, "bg-red-500");
+        }
+
+        function checkQ1_2() {
+            const val = parseInt(document.getElementById('q1_2').value);
+            const diff = (level1Data[1].symbols - level1Data[2].symbols) * 5;
+            if(val === diff) showToast("正确！四年级比五年级多 " + diff + " 人。");
+            else showToast("再数数看，每个符号代表5个人哦！", "bg-red-500");
+        }
+
+        function checkQ1_3() {
+            const val = parseInt(document.getElementById('q1_3').value);
+            let needed = 0;
+            level1Data.forEach(item => {
+                if(item.symbols < 6) needed += (6 - item.symbols);
+            });
+            if(val === needed) showToast("天才侦探！一共还需要增加 " + needed + " 个符号。");
+            else showToast(`算错啦，目标是每行6个符号，现在还差 ${needed} 个。`, "bg-red-500");
+        }
+
+        // --- 第二关逻辑 ---
+        function renderLevel2() {
+            const container = document.getElementById('readChart');
+            if(!container) return;
+            container.innerHTML = '<div class="text-center font-bold text-gray-400 text-sm border-b pb-2 mb-4">阅读进度榜</div>';
+            level2Data.forEach((item) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-4';
+                row.innerHTML = `
+                    <span class="w-12 text-sm font-bold text-gray-600">${item.name}</span>
+                    <div class="flex gap-1">
+                        ${Array(item.symbols).fill(0).map(() => `
+                            <div class="w-6 h-6 bg-blue-500 border-2 border-white shadow-sm flex items-center justify-center text-white font-bold transform rotate-45 text-[8px] symbol-item"></div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function checkQ2_1() {
+            const val = parseInt(document.getElementById('q2_1').value);
+            if(val === 8) showToast("完全正确！多出了4个符号，所以是8天。");
+            else showToast("看看凯文比世杰多出了几个符号？每个2天。", "bg-red-500");
+        }
+
+        function checkQ2_2() {
+            const val = parseInt(document.getElementById('q2_2').value);
+            const totalSymbols = level2Data.reduce((acc, curr) => acc + curr.symbols, 0);
+            if(val === totalSymbols * 2) showToast("太厉害了！总天数是 " + (totalSymbols * 2) + " 天！");
+            else showToast("提示：先算出符号总数，再乘2。", "bg-red-500");
+        }
+
+        function checkQ2_3() {
+            const val = document.getElementById('q2_3').value;
+            if(val === "温妮") showToast("目光如炬！温妮排在第二名。");
+            else showToast("数数看，谁的符号数量排在第二？", "bg-red-500");
+        }
+
+        function checkQ2_4() {
+            const val = parseInt(document.getElementById('q2_4').value);
+            const currentTotalDays = level2Data.reduce((acc, curr) => acc + curr.symbols, 0) * 2;
+            const needed = 50 - currentTotalDays;
+            if(val === needed) showToast(`终极挑战成功！还需要 ${needed} 天。`);
+            else showToast(`提示：现在的总天数是 ${currentTotalDays} 天。`, "bg-red-500");
+        }
+
+        // --- 通用功能 ---
+        function switchLevel(lvl) {
+            const l1 = document.getElementById('level1');
+            const l2 = document.getElementById('level2');
+            const t1 = document.getElementById('tab1');
+            const t2 = document.getElementById('tab2');
+            const progress = document.getElementById('progressBar');
+
+            if(lvl === 1) {
+                l1.classList.remove('hidden');
+                l2.classList.add('hidden');
+                t1.className = "px-6 py-2 rounded-full font-bold bg-blue-500 text-white shadow-lg";
+                t2.className = "px-6 py-2 rounded-full font-bold bg-white text-blue-500 hover:bg-blue-50 transition";
+                progress.style.width = '50%';
+                renderLevel1();
+            } else {
+                l1.classList.add('hidden');
+                l2.classList.remove('hidden');
+                t2.className = "px-6 py-2 rounded-full font-bold bg-purple-500 text-white shadow-lg";
+                t1.className = "px-6 py-2 rounded-full font-bold bg-white text-blue-500 hover:bg-blue-50 transition";
+                progress.style.width = '100%';
+                renderLevel2();
+            }
+        }
+
+        function showToast(msg, color = "bg-green-600") {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.className = `fixed bottom-10 left-1/2 transform -translate-x-1/2 text-white px-8 py-4 rounded-full shadow-2xl font-bold transition-opacity z-50 ${color}`;
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2500);
+        }
+
+        window.onload = renderLevel1;
+    </script>
+</body>
+</html>
