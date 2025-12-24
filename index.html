@@ -237,11 +237,12 @@
             { grade: "六年级", symbols: 4 }
         ];
 
+        // 更新关卡2数据：凯文原为7个符号，现改为6个
         const level2Data = [
             { name: "温妮", symbols: 5 },
             { name: "艾莎", symbols: 4 },
             { name: "世杰", symbols: 3 },
-            { name: "凯文", symbols: 7 }
+            { name: "凯文", symbols: 6 }
         ];
 
         // --- 第一关逻辑 ---
@@ -331,7 +332,8 @@
 
         function checkQ2_1() {
             const val = parseInt(document.getElementById('q2_1').value);
-            if(val === 8) showToast("完全正确！多出了4个符号，所以是8天。");
+            // 凯文6个，世杰3个，差3个符号 = 6天
+            if(val === 6) showToast("完全正确！多出了3个符号，所以是6天。");
             else showToast("看看凯文比世杰多出了几个符号？每个2天。", "bg-red-500");
         }
 
@@ -344,6 +346,8 @@
 
         function checkQ2_3() {
             const val = document.getElementById('q2_3').value;
+            // 排名：凯文(6) > 温妮(5) > 艾莎(4) > 世杰(3)
+            // 第一名是凯文，第二名是温妮
             if(val === "温妮") showToast("目光如炬！温妮排在第二名。");
             else showToast("数数看，谁的符号数量排在第二？", "bg-red-500");
         }
